@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}BookBuddy — Top 50 Books{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <section class="hero">
+    <h1>Find your next <em>favorite</em> book, faster.</h1>
+
+    <form class="catalog-search" action="/recommend_books" method="post" data-combobox data-source="all-books-data">
+      <span class="catalog-label">Search the stacks</span>
+      <div class="combobox">
+        <div class="combobox-field">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="combobox-input" placeholder="Try “The Hobbit” or “1984”…" autocomplete="off">
+          <button type="submit" class="btn btn-primary combobox-submit" disabled>Get recommendations</button>
+        </div>
+        <input type="hidden" name="user_input" class="combobox-hidden">
+        <div class="combobox-panel" role="listbox"></div>
+      </div>
+    </form>
+  </section>
+
+  <div class="section-head">
+    <h2>Top 50 books, by reader rating</h2>
+  </div>
+
+  <div class="book-grid">
+    {% for i in range(book_name|length) %}
+      {% set r = rating[i] %}
+      {% set stars5 = (r / 2) %}
+      {% set spine = 'spine-high' if r >= 8 else ('spine-mid' if r >= 6 else 'spine-low') %}
+      <div class="book-card">
+        <span class="rank">#{{ '%02d'|format(i + 1) }}</span>
+        <div class="book-cover {{ spine }}">
+          <img class="cover-img"
+               src="https://covers.openlibrary.org/b/isbn/{{ isbn[i] }}-M.jpg?default=false"
+               data-orig="{{ image[i] }}"
+               data-stage="olid"
+               onerror="handleCoverError(this)"
+               alt="Cover of {{ book_name[i] }}"
+               loading="lazy">
+          <div class="cover-fallback" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span class="ft">{{ book_name[i] }}</span>
+          </div>
+        </div>
+        <div class="book-body">
+          <div class="book-title-txt">{{ book_name[i] }}</div>
+          <div class="book-author">{{ author[i] }}</div>
+          <div class="book-meta">
+            <span class="stars">{{ '★' * (stars5|round(0, 'floor')|int) }}{{ '☆' * (5 - (stars5|round(0, 'floor')|int)) }}</span>
+            <span class="votes">{{ votes[i] }} votes</span>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% include "_books_data.html" %}
+{% endblock %}
